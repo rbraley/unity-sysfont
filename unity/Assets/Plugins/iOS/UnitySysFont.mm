@@ -271,7 +271,7 @@ maxHeightPixels:(int)_maxHeightPixels textureID:(int)_textureID
   if(isRGBA)
   {
     CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-    void *bitmapData = calloc(textureHeight*4, textureWidth);
+    void *bitmapData = calloc(textureHeight*4, textureWidth);  
     CGContextRef context = CGBitmapContextCreate(bitmapData, textureWidth,
       textureHeight, 8, textureWidth*4, colorSpace, kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
   }
@@ -281,7 +281,7 @@ maxHeightPixels:(int)_maxHeightPixels textureID:(int)_textureID
       CGContextRef context = CGBitmapContextCreate(bitmapData, textureWidth,
       textureHeight, 8, textureWidth, NULL, kCGImageAlphaOnly);
   }
-
+  
 
   if (context == NULL)
   {
@@ -323,11 +323,11 @@ maxHeightPixels:(int)_maxHeightPixels textureID:(int)_textureID
   NSBitmapImageRep *bitmap;
   if (isRGBA)
   {
-    bitmap = [[NSBitmapImageRep alloc]
-      initWithBitmapDataPlanes:NULL pixelsWide:textureWidth
-      pixelsHigh:textureHeight bitsPerSample:8 samplesPerPixel:4 hasAlpha:YES
-      isPlanar:NO colorSpaceName:NSDeviceRGBColorSpace bitmapFormat:0
-      bytesPerRow:textureWidth*4 bitsPerPixel:32];
+    bitmap = [[NSBitmapImageRep alloc]                                                             
+      initWithBitmapDataPlanes:NULL pixelsWide:textureWidth                                
+      pixelsHigh:textureHeight bitsPerSample:8 samplesPerPixel:4 hasAlpha:YES              
+      isPlanar:NO colorSpaceName:NSDeviceRGBColorSpace bitmapFormat:0                      
+      bytesPerRow:textureWidth*4 bitsPerPixel:32];   
   }
   else
   {
@@ -521,7 +521,7 @@ void _SysFontQueueTexture(const char *text, const char *fontName,
   UnitySysFontTextureUpdate *update;
 
   update = [[UnitySysFontTextureUpdate alloc] initWithText:text
-    fontName:fontName fontSize:fontSize isBold:isBold isItalic:isItalic
+    fontName:fontName fontSize:fontSize isBold:isBold isItalic:isItalic 
     isRGBA:isRGBA alignment:alignment maxWidthPixels:maxWidthPixels
     maxHeightPixels:maxHeightPixels textureID:textureID];
 

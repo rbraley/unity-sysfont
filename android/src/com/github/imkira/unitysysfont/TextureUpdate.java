@@ -57,7 +57,7 @@ public class TextureUpdate {
   private StaticLayout layout;
   
   public TextureUpdate(String text, String fontName, int fontSize,
-      boolean isBold, boolean isItalic, boolean isRGBA, int alignment,
+      boolean isBold, boolean isItalic, boolean isRGBA, int alignment, 
       int maxWidthPixels, int maxHeightPixels, int textureID) {
     this.text = text;
     this.fontName = fontName;

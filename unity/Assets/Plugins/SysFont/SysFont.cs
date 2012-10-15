@@ -116,7 +116,7 @@ public class SysFont : MonoBehaviour
 
   private static void _SysFontQueueTexture(string text,
       string fontName, int fontSize, bool isBold, bool isItalic,
-      bool isRGBA, Alignment alignment, int maxWidthPixels,
+      bool isRGBA, Alignment alignment, int maxWidthPixels, 
       int maxHeightPixels, int textureID)
   {
     UnitySysFontInstance.Call("queueTexture", text, fontName, fontSize,
@@ -163,7 +163,7 @@ public class SysFont : MonoBehaviour
 
   private static void _SysFontQueueTexture(string text,
       string fontName, int fontSize, bool isBold, bool isItalic,
-      bool isRGBA, Alignment alignment, int maxWidthPixels,
+      bool isRGBA, Alignment alignment, int maxWidthPixels, 
       int maxHeightPixels, int textureID)
   {
     // dummy function: just don't fail the build

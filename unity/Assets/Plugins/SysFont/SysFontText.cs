@@ -234,6 +234,7 @@ public class SysFontText : MonoBehaviour, ISysFontTexturable
 
   [SerializeField]
   protected PivotAlignment _pivot = PivotAlignment.Center;
+  
 
   protected Color _lastFontColor;
   public Color FontColor
