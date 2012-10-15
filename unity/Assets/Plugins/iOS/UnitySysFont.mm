@@ -60,6 +60,7 @@ int nextPowerOfTwo(int n)
   int fontSize;
   BOOL isBold;
   BOOL isItalic;
+  BOOL isRGBA;
   int alignment;
   int maxWidthPixels;
   int maxHeightPixels;
@@ -97,7 +98,7 @@ int nextPowerOfTwo(int n)
 
 - (id)initWithText:(const char *)_text fontName:(const char *)_fontName
 fontSize:(int)_fontSize isBold:(BOOL)_isBold isItalic:(BOOL)_isItalic
-alignment:(int)_alignment maxWidthPixels:(int)_maxWidthPixels
+isRGBA:(BOOL)_isRGBA alignment:(int)_alignment maxWidthPixels:(int)_maxWidthPixels
 maxHeightPixels:(int)_maxHeightPixels textureID:(int)_textureID
 {
   self = [super init];
@@ -111,6 +112,7 @@ maxHeightPixels:(int)_maxHeightPixels textureID:(int)_textureID
     fontSize = _fontSize;
     isBold = _isBold;
     isItalic = _isItalic;
+    isRGBA = _isRGBA;
     alignment = _alignment;
     maxWidthPixels = _maxWidthPixels;
     maxHeightPixels = _maxHeightPixels;
@@ -266,9 +268,20 @@ maxHeightPixels:(int)_maxHeightPixels textureID:(int)_textureID
 #if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 - (void)render
 {
-  void *bitmapData = calloc(textureHeight, textureWidth);
-  CGContextRef context = CGBitmapContextCreate(bitmapData, textureWidth,
+  if(isRGBA)
+  {
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    void *bitmapData = calloc(textureHeight*4, textureWidth);
+    CGContextRef context = CGBitmapContextCreate(bitmapData, textureWidth,
+      textureHeight, 8, textureWidth*4, colorSpace, kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
+  }
+  else
+  {
+    void *bitmapData = calloc(textureHeight, textureWidth);
+      CGContextRef context = CGBitmapContextCreate(bitmapData, textureWidth,
       textureHeight, 8, textureWidth, NULL, kCGImageAlphaOnly);
+  }
+
 
   if (context == NULL)
   {
@@ -299,7 +312,7 @@ maxHeightPixels:(int)_maxHeightPixels textureID:(int)_textureID
 
   UIGraphicsPopContext();
 
-  [self bindTextureWithFormat:GL_ALPHA bitmapData:bitmapData];
+  [self bindTextureWithFormat:(isRGBA ? GL_RGBA : GL_ALPHA) bitmapData:bitmapData];
 
   CGContextRelease(context); 
   free(bitmapData);
@@ -307,11 +320,23 @@ maxHeightPixels:(int)_maxHeightPixels textureID:(int)_textureID
 #elif TARGET_OS_MAC
 - (void)render
 {
-  NSBitmapImageRep *bitmap = [[NSBitmapImageRep alloc]
-    initWithBitmapDataPlanes:NULL pixelsWide:textureWidth
-    pixelsHigh:textureHeight bitsPerSample:8 samplesPerPixel:1 hasAlpha:NO
-    isPlanar:NO colorSpaceName:NSCalibratedWhiteColorSpace bitmapFormat:0
-    bytesPerRow:textureWidth bitsPerPixel:8];
+  NSBitmapImageRep *bitmap;
+  if (isRGBA)
+  {
+    bitmap = [[NSBitmapImageRep alloc]
+      initWithBitmapDataPlanes:NULL pixelsWide:textureWidth
+      pixelsHigh:textureHeight bitsPerSample:8 samplesPerPixel:4 hasAlpha:YES
+      isPlanar:NO colorSpaceName:NSDeviceRGBColorSpace bitmapFormat:0
+      bytesPerRow:textureWidth*4 bitsPerPixel:32];
+  }
+  else
+  {
+    bitmap = [[NSBitmapImageRep alloc]
+      initWithBitmapDataPlanes:NULL pixelsWide:textureWidth
+      pixelsHigh:textureHeight bitsPerSample:8 samplesPerPixel:1 hasAlpha:NO
+      isPlanar:NO colorSpaceName:NSCalibratedWhiteColorSpace bitmapFormat:0
+      bytesPerRow:textureWidth bitsPerPixel:8];
+  }
 
   if (bitmap == nil)
   {
@@ -340,7 +365,7 @@ maxHeightPixels:(int)_maxHeightPixels textureID:(int)_textureID
 
   [NSGraphicsContext restoreGraphicsState];
 
-  [self bindTextureWithFormat:GL_ALPHA bitmapData:[bitmap bitmapData]];
+  [self bindTextureWithFormat:(isRGBA ? GL_RGBA : GL_ALPHA) bitmapData:[bitmap bitmapData]];
 
   [bitmap release];
 }
@@ -354,7 +379,7 @@ maxHeightPixels:(int)_maxHeightPixels textureID:(int)_textureID
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, textureWidth, textureHeight, 0,
+  glTexImage2D(GL_TEXTURE_2D, 0, isRGBA? GL_RGBA : GL_ALPHA, textureWidth, textureHeight, 0,
       format, GL_UNSIGNED_BYTE, data);
 }
 @end
@@ -468,7 +493,7 @@ static UnitySysFontTextureManager *sharedInstance;
 extern "C"
 {
   void _SysFontQueueTexture(const char *text, const char *fontName,
-      int fontSize, BOOL isBold, BOOL isItalic, int alignment,
+      int fontSize, BOOL isBold, BOOL isItalic, BOOL isRGBA, int alignment,
       int maxWidthPixels, int maxHeightPixels, int textureID);
 
   int _SysFontGetTextureWidth(int textureID);
@@ -489,7 +514,7 @@ extern "C"
 }
 
 void _SysFontQueueTexture(const char *text, const char *fontName,
-    int fontSize, BOOL isBold, BOOL isItalic, int alignment,
+    int fontSize, BOOL isBold, BOOL isItalic, BOOL isRGBA, int alignment,
     int maxWidthPixels, int maxHeightPixels, int textureID)
 {
   UnitySysFontTextureManager *instance;
@@ -497,7 +522,7 @@ void _SysFontQueueTexture(const char *text, const char *fontName,
 
   update = [[UnitySysFontTextureUpdate alloc] initWithText:text
     fontName:fontName fontSize:fontSize isBold:isBold isItalic:isItalic
-    alignment:alignment maxWidthPixels:maxWidthPixels
+    isRGBA:isRGBA alignment:alignment maxWidthPixels:maxWidthPixels
     maxHeightPixels:maxHeightPixels textureID:textureID];
 
   instance = [UnitySysFontTextureManager sharedInstance];

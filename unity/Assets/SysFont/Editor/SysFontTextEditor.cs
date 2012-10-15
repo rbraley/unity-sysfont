@@ -56,6 +56,20 @@ public class SysFontTextEditor : SysFontEditor
         text.FontColor = fontColor;
       }
 
+      LookLikeControls(30f);
+
+      //
+      // Color Emoji property
+      //
+      EditorGUILayout.PrefixLabel("Color Emoji");
+      bool isColorEmoji = EditorGUILayout.Toggle(text.IsRGBA,
+          GUILayout.Width(30f));
+      if (isColorEmoji != text.IsRGBA)
+      {
+        RegisterUndo(text, "SysFont Color Emoji Change");
+        text.IsRGBA = isColorEmoji;
+      }
+
       LookLikeControls(40f);
 
       //

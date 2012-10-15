@@ -46,6 +46,10 @@ public class SysFontTexture : ISysFontTexturable
   protected bool _isItalic = false;
 
   [SerializeField]
+  protected bool _isRGBA = false;
+
+
+  [SerializeField]
   protected SysFont.Alignment _alignment = SysFont.Alignment.Left;
 
   [SerializeField]
@@ -178,6 +182,22 @@ public class SysFontTexture : ISysFontTexturable
     }
   }
 
+  protected bool _lastIsRGBA;
+  public bool IsRGBA
+  {
+    get
+    {
+      return _isRGBA;
+    }
+    set
+    {
+      if (_isRGBA != value)
+      {
+        _isRGBA = value;
+      }
+    }
+  }
+
   protected SysFont.Alignment _lastAlignment;
   public SysFont.Alignment Alignment
   {
@@ -296,6 +316,7 @@ public class SysFontTexture : ISysFontTexturable
         (_fontSize != _lastFontSize) ||
         (_isBold != _lastIsBold) ||
         (_isItalic != _lastIsItalic) ||
+        (_isRGBA != _lastIsRGBA) ||
         (_alignment != _lastAlignment) ||
         (_isMultiLine != _lastIsMultiLine) ||
         (_maxWidthPixels != _lastMaxWidthPixels) ||
@@ -307,7 +328,7 @@ public class SysFontTexture : ISysFontTexturable
   {
     if (_texture == null)
     {
-      _texture = new Texture2D(1, 1, TextureFormat.Alpha8, false);
+      _texture = new Texture2D(1, 1, _isRGBA ? TextureFormat.RGBA32 : TextureFormat.Alpha8, false);
       _texture.hideFlags = HideFlags.HideInInspector | HideFlags.DontSave;
       _texture.filterMode = FilterMode.Point;
       _texture.wrapMode = TextureWrapMode.Clamp;
@@ -317,7 +338,7 @@ public class SysFontTexture : ISysFontTexturable
     int textureID = _texture.GetNativeTextureID();
 
     SysFont.QueueTexture(_text, FontName, _fontSize, _isBold,
-        _isItalic, _alignment, _isMultiLine, _maxWidthPixels,
+        _isItalic, _isRGBA, _alignment, _isMultiLine, _maxWidthPixels,
         _maxHeightPixels, textureID);
 
     _textWidthPixels = SysFont.GetTextWidth(textureID);
@@ -332,6 +353,7 @@ public class SysFontTexture : ISysFontTexturable
     _lastFontSize = _fontSize;
     _lastIsBold = _isBold;
     _lastIsItalic = _isItalic;
+    _lastIsRGBA = _isRGBA;
     _lastAlignment = _alignment;
     _lastIsMultiLine = _isMultiLine;
     _lastMaxWidthPixels = _maxWidthPixels;

@@ -41,6 +41,7 @@ public class TextureUpdate {
   private int fontSize;
   private boolean isBold;
   private boolean isItalic;
+  private boolean isRGBA;
   private int alignment;
   private int maxWidthPixels;
   private int maxHeightPixels;
@@ -56,13 +57,14 @@ public class TextureUpdate {
   private StaticLayout layout;
   
   public TextureUpdate(String text, String fontName, int fontSize,
-      boolean isBold, boolean isItalic, int alignment, int maxWidthPixels,
-      int maxHeightPixels, int textureID) {
+      boolean isBold, boolean isItalic, boolean isRGBA, int alignment,
+      int maxWidthPixels, int maxHeightPixels, int textureID) {
     this.text = text;
     this.fontName = fontName;
     this.fontSize = fontSize;
     this.isBold = isBold;
     this.isItalic = isItalic;
+    this.isRGBA = isRGBA;
     this.alignment = alignment;
     this.maxWidthPixels = maxWidthPixels;
     this.maxHeightPixels = maxHeightPixels;
@@ -180,7 +182,7 @@ public class TextureUpdate {
 
   public void render() {
     Bitmap bitmap = Bitmap.createBitmap(textureWidth, textureHeight,
-        Bitmap.Config.ALPHA_8);
+        Bitmap.Config.ARGB_8888);
 
     Canvas canvas = new Canvas(bitmap);
     canvas.translate(0, textHeight);

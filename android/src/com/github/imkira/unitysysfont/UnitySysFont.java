@@ -47,11 +47,11 @@ public class UnitySysFont {
   }
 
   public void queueTexture(String text, String fontName, int fontSize,
-      boolean isBold, boolean isItalic, int alignment, int maxWidthPixels,
+      boolean isBold, boolean isItalic, boolean isRGBA, int alignment, int maxWidthPixels,
       int maxHeightPixels, int textureID) {
 
     TextureUpdate update = new TextureUpdate(text, fontName, fontSize, isBold,
-        isItalic, alignment, maxWidthPixels, maxHeightPixels, textureID);
+        isItalic, isRGBA, alignment, maxWidthPixels, maxHeightPixels, textureID);
     synchronized (updateQueue) {
       updateQueue.put(textureID, update);
     }

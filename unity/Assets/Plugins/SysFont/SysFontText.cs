@@ -115,6 +115,18 @@ public class SysFontText : MonoBehaviour, ISysFontTexturable
     }
   }
 
+  public bool IsRGBA
+  {
+    get
+    {
+      return _texture.IsRGBA;
+    }
+    set
+    {
+      _texture.IsRGBA = value;
+    }
+  }
+
   public SysFont.Alignment Alignment
   {
     get

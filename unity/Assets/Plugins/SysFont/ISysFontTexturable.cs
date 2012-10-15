@@ -67,6 +67,12 @@ public interface ISysFontTexturable
     set;
   }
 
+  bool IsRGBA
+  {
+    get;
+    set;
+  }
+
   SysFont.Alignment Alignment
   {
     get;
