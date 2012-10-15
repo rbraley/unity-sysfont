@@ -268,17 +268,21 @@ maxHeightPixels:(int)_maxHeightPixels textureID:(int)_textureID
 #if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 - (void)render
 {
+  CGContextRef context;
+  CGColorSpaceRef colorSpace;
+  void *bitmapData;
   if(isRGBA)
   {
-    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-    void *bitmapData = calloc(textureHeight*4, textureWidth);  
-    CGContextRef context = CGBitmapContextCreate(bitmapData, textureWidth,
+    colorSpace = CGColorSpaceCreateDeviceRGB();
+    bitmapData = calloc(textureHeight*4, textureWidth);  
+    context = CGBitmapContextCreate(bitmapData, textureWidth,
       textureHeight, 8, textureWidth*4, colorSpace, kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
+
   }
   else
   {
-    void *bitmapData = calloc(textureHeight, textureWidth);
-      CGContextRef context = CGBitmapContextCreate(bitmapData, textureWidth,
+    bitmapData = calloc(textureHeight, textureWidth);
+      context = CGBitmapContextCreate(bitmapData, textureWidth,
       textureHeight, 8, textureWidth, NULL, kCGImageAlphaOnly);
   }
   
@@ -314,7 +318,8 @@ maxHeightPixels:(int)_maxHeightPixels textureID:(int)_textureID
 
   [self bindTextureWithFormat:(isRGBA ? GL_RGBA : GL_ALPHA) bitmapData:bitmapData];
 
-  CGContextRelease(context); 
+  CGContextRelease(context);
+  CGColorSpaceRelease(colorSpace);
   free(bitmapData);
 }
 #elif TARGET_OS_MAC
