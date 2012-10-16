@@ -269,7 +269,7 @@ maxHeightPixels:(int)_maxHeightPixels textureID:(int)_textureID
 - (void)render
 {
   CGContextRef context;
-  CGColorSpaceRef colorSpace;
+  CGColorSpaceRef colorSpace = NULL;
   void *bitmapData;
   if(isRGBA)
   {
@@ -319,7 +319,7 @@ maxHeightPixels:(int)_maxHeightPixels textureID:(int)_textureID
   [self bindTextureWithFormat:(isRGBA ? GL_RGBA : GL_ALPHA) bitmapData:bitmapData];
 
   CGContextRelease(context);
-  CGColorSpaceRelease(colorSpace);
+  if(colorSpace != NULL) CGColorSpaceRelease(colorSpace);
   free(bitmapData);
 }
 #elif TARGET_OS_MAC
