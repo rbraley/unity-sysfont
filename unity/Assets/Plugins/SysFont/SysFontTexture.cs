@@ -46,6 +46,9 @@ public class SysFontTexture : ISysFontTexturable
   protected bool _isItalic = false;
 
   [SerializeField]
+  protected Color _fontColor;
+
+  [SerializeField]
   protected bool _isRGBA = false;
 
 
@@ -182,6 +185,23 @@ public class SysFontTexture : ISysFontTexturable
     }
   }
 
+  protected Color _lastFontColor;
+  public Color FontColor
+  {
+    get
+    {
+      return _fontColor;
+    }
+    set
+    {
+      if (_fontColor != value)
+      {
+        _fontColor = value;
+      }
+    }
+  }
+
+
   protected bool _lastIsRGBA;
   public bool IsRGBA
   {
@@ -316,6 +336,7 @@ public class SysFontTexture : ISysFontTexturable
         (_fontSize != _lastFontSize) ||
         (_isBold != _lastIsBold) ||
         (_isItalic != _lastIsItalic) ||
+        (_fontColor != _lastFontColor) ||
         (_isRGBA != _lastIsRGBA) ||
         (_alignment != _lastAlignment) ||
         (_isMultiLine != _lastIsMultiLine) ||
@@ -337,8 +358,15 @@ public class SysFontTexture : ISysFontTexturable
 
     int textureID = _texture.GetNativeTextureID();
 
+    uint r = (uint)(_fontColor.r * 255);
+    uint g = (uint)(_fontColor.g * 255) << 8;
+    uint b = (uint)(_fontColor.b * 255) << 16;
+    uint a = (uint)(_fontColor.a * 255) << 24;
+
+    uint color = r + g + b + a;
+
     SysFont.QueueTexture(_text, FontName, _fontSize, _isBold,
-        _isItalic, _isRGBA, _alignment, _isMultiLine, _maxWidthPixels,
+        _isItalic, color, _isRGBA, _alignment, _isMultiLine, _maxWidthPixels,
         _maxHeightPixels, textureID);
 
     _textWidthPixels = SysFont.GetTextWidth(textureID);
@@ -353,6 +381,7 @@ public class SysFontTexture : ISysFontTexturable
     _lastFontSize = _fontSize;
     _lastIsBold = _isBold;
     _lastIsItalic = _isItalic;
+    _lastFontColor = _fontColor;
     _lastIsRGBA = _isRGBA;
     _lastAlignment = _alignment;
     _lastIsMultiLine = _isMultiLine;

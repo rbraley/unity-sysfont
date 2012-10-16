@@ -42,7 +42,7 @@ public class SysFont : MonoBehaviour
   [DllImport("__Internal")]
 #endif
   private static extern void _SysFontQueueTexture(string text,
-      string fontName, int fontSize, bool isBold, bool isItalic,
+      string fontName, int fontSize, bool isBold, bool isItalic, uint color,
       bool isRGBA, Alignment alignment, int maxWidthPixels,
       int maxHeightPixels, int textureID);
 
@@ -115,12 +115,12 @@ public class SysFont : MonoBehaviour
   }
 
   private static void _SysFontQueueTexture(string text,
-      string fontName, int fontSize, bool isBold, bool isItalic,
+      string fontName, int fontSize, bool isBold, bool isItalic, uint color,
       bool isRGBA, Alignment alignment, int maxWidthPixels, 
       int maxHeightPixels, int textureID)
   {
     UnitySysFontInstance.Call("queueTexture", text, fontName, fontSize,
-        isBold, isItalic, isRGBA, (int)alignment, maxWidthPixels, maxHeightPixels,
+        isBold, isItalic, color, isRGBA, (int)alignment, maxWidthPixels, maxHeightPixels,
         textureID);
   }
 
@@ -162,7 +162,7 @@ public class SysFont : MonoBehaviour
 #else
 
   private static void _SysFontQueueTexture(string text,
-      string fontName, int fontSize, bool isBold, bool isItalic,
+      string fontName, int fontSize, bool isBold, bool isItalic, uint color,
       bool isRGBA, Alignment alignment, int maxWidthPixels, 
       int maxHeightPixels, int textureID)
   {
@@ -231,14 +231,14 @@ public class SysFont : MonoBehaviour
   }
 
   public static void QueueTexture(string text, string fontName,
-      int fontSize, bool isBold, bool isItalic, bool isRGBA, Alignment alignment,
+      int fontSize, bool isBold, bool isItalic, uint color, bool isRGBA, Alignment alignment,
       bool isMultiLine, int maxWidthPixels, int maxHeightPixels, int textureID)
   {
     if (isMultiLine == false)
     {
       text = text.Replace("\r\n", "").Replace("\n", "");
     }
-    _SysFontQueueTexture(text, fontName, fontSize, isBold, isItalic, isRGBA,
+    _SysFontQueueTexture(text, fontName, fontSize, isBold, isItalic, color, isRGBA,
         alignment, maxWidthPixels, maxHeightPixels, textureID);
   }
 

@@ -24,7 +24,7 @@ Shader "SysFont/RGBA"
       Fog { Mode Off }
       Offset -1, -1
       ColorMask RGB
-      AlphaTest Greater .01
+      AlphaTest Off
       Blend SrcAlpha OneMinusSrcAlpha
       ColorMaterial AmbientAndDiffuse
       

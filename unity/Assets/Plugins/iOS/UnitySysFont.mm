@@ -60,6 +60,7 @@ int nextPowerOfTwo(int n)
   int fontSize;
   BOOL isBold;
   BOOL isItalic;
+  uint color;
   BOOL isRGBA;
   int alignment;
   int maxWidthPixels;
@@ -82,8 +83,10 @@ int nextPowerOfTwo(int n)
 - (NSNumber *)textureID;
 #if TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
 - (UIFont *)font;
+- (UIColor *)fontColor;
 #elif TARGET_OS_MAC
 - (NSFont *)font;
+- (NSColor *)fontColor;
 #endif
 - (void)prepare;
 - (void)render;
@@ -97,7 +100,7 @@ int nextPowerOfTwo(int n)
 @synthesize ready;
 
 - (id)initWithText:(const char *)_text fontName:(const char *)_fontName
-fontSize:(int)_fontSize isBold:(BOOL)_isBold isItalic:(BOOL)_isItalic
+          fontSize:(int)_fontSize isBold:(BOOL)_isBold isItalic:(BOOL)_isItalic color:(uint)_color
 isRGBA:(BOOL)_isRGBA alignment:(int)_alignment maxWidthPixels:(int)_maxWidthPixels
 maxHeightPixels:(int)_maxHeightPixels textureID:(int)_textureID
 {
@@ -112,6 +115,7 @@ maxHeightPixels:(int)_maxHeightPixels textureID:(int)_textureID
     fontSize = _fontSize;
     isBold = _isBold;
     isItalic = _isItalic;
+    color = _color;
     isRGBA = _isRGBA;
     alignment = _alignment;
     maxWidthPixels = _maxWidthPixels;
@@ -172,6 +176,16 @@ maxHeightPixels:(int)_maxHeightPixels textureID:(int)_textureID
   }
   return font;
 }
+
+- (UIColor *)fontColor
+{
+  uint r = color & 0x000000FF;
+  uint g = (color & 0x0000FF00) >> 8;
+  uint b = (color & 0x00FF0000) >> 16;
+  uint a = (color & 0xFF000000) >> 24;
+  return [UIColor colorWithRed: r/255.0 green:g/255.0 blue:b/255.0 alpha:a/255.0];
+}
+
 #elif TARGET_OS_MAC
 - (NSFont *)font
 {
@@ -201,6 +215,16 @@ maxHeightPixels:(int)_maxHeightPixels textureID:(int)_textureID
 
   return font;
 }
+
+- (NSColor *)fontColor
+{
+  uint r = color & 0x000000FF;
+  uint g = (color & 0x0000FF00) >> 8;
+  uint b = (color & 0x00FF0000) >> 16;
+  uint a = (color & 0xFF000000) >> 24;
+  return [NSColor colorWithDeviceRed:r/255.0 green:g/255.0 blue:b/255.0 alpha:a/255.0];
+}
+
 #endif
 
 - (void)prepare
@@ -230,7 +254,7 @@ maxHeightPixels:(int)_maxHeightPixels textureID:(int)_textureID
 
   NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
     [self font], NSFontAttributeName,
-    [NSColor whiteColor], NSForegroundColorAttributeName,
+    [self fontColor], NSForegroundColorAttributeName,
     [NSColor clearColor], NSBackgroundColorAttributeName,
     parStyle, NSParagraphStyleAttributeName, nil];
 
@@ -311,6 +335,7 @@ maxHeightPixels:(int)_maxHeightPixels textureID:(int)_textureID
     _alignment = UITextAlignmentRight;
   }
 
+  [[self fontColor] set];
   [text drawInRect:drawRect withFont:[self font]
     lineBreakMode:UILineBreakModeWordWrap alignment:_alignment];
 
@@ -364,7 +389,7 @@ maxHeightPixels:(int)_maxHeightPixels textureID:(int)_textureID
   [[NSColor clearColor] setFill];
   NSRectFill(textureRect);
 
-  [[NSColor whiteColor] set];
+  [[self fontColor] set];
   [attributedString drawWithRect:drawRect
     options:NSStringDrawingUsesLineFragmentOrigin];
 
@@ -498,7 +523,7 @@ static UnitySysFontTextureManager *sharedInstance;
 extern "C"
 {
   void _SysFontQueueTexture(const char *text, const char *fontName,
-      int fontSize, BOOL isBold, BOOL isItalic, BOOL isRGBA, int alignment,
+      int fontSize, BOOL isBold, BOOL isItalic, uint color, BOOL isRGBA, int alignment,
       int maxWidthPixels, int maxHeightPixels, int textureID);
 
   int _SysFontGetTextureWidth(int textureID);
@@ -519,15 +544,15 @@ extern "C"
 }
 
 void _SysFontQueueTexture(const char *text, const char *fontName,
-    int fontSize, BOOL isBold, BOOL isItalic, BOOL isRGBA, int alignment,
+    int fontSize, BOOL isBold, BOOL isItalic, uint color, BOOL isRGBA, int alignment,
     int maxWidthPixels, int maxHeightPixels, int textureID)
 {
   UnitySysFontTextureManager *instance;
   UnitySysFontTextureUpdate *update;
 
   update = [[UnitySysFontTextureUpdate alloc] initWithText:text
-    fontName:fontName fontSize:fontSize isBold:isBold isItalic:isItalic 
-    isRGBA:isRGBA alignment:alignment maxWidthPixels:maxWidthPixels
+    fontName:fontName fontSize:fontSize isBold:isBold isItalic:isItalic
+    color:color isRGBA:isRGBA alignment:alignment maxWidthPixels:maxWidthPixels
     maxHeightPixels:maxHeightPixels textureID:textureID];
 
   instance = [UnitySysFontTextureManager sharedInstance];

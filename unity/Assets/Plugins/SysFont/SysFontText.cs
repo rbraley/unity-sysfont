@@ -115,6 +115,19 @@ public class SysFontText : MonoBehaviour, ISysFontTexturable
     }
   }
 
+  public Color FontColor
+  {
+    get
+    {
+      return _texture.FontColor;
+    }
+    set
+    {
+      _texture.FontColor = value;
+    }
+  }
+
+
   public bool IsRGBA
   {
     get
@@ -216,9 +229,6 @@ public class SysFontText : MonoBehaviour, ISysFontTexturable
   }
   #endregion
 
-  [SerializeField]
-  protected Color _fontColor = Color.white;
-
   public enum PivotAlignment
   {
     TopLeft,
@@ -232,25 +242,11 @@ public class SysFontText : MonoBehaviour, ISysFontTexturable
     BottomRight
   }
 
+  protected Color _lastFontColor;
+
   [SerializeField]
   protected PivotAlignment _pivot = PivotAlignment.Center;
   
-
-  protected Color _lastFontColor;
-  public Color FontColor
-  {
-    get
-    {
-      return _fontColor;
-    }
-    set
-    {
-      if (_fontColor != value)
-      {
-        _fontColor = value;
-      }
-    }
-  }
 
   protected PivotAlignment _lastPivot;
   public PivotAlignment Pivot
@@ -278,8 +274,10 @@ public class SysFontText : MonoBehaviour, ISysFontTexturable
   protected Mesh _mesh = null;
   protected MeshFilter _filter = null;
   protected MeshRenderer _renderer = null;
+  protected Shader _shader = null;
 
-  static protected Shader _shader = null;
+  static protected Shader RGBAShader = Shader.Find("SysFont/RGBA");
+  static protected Shader NoRGBAShader = Shader.Find("SysFont/Unlit Transparent");
 
   protected void UpdateMesh()
   {
@@ -304,26 +302,27 @@ public class SysFontText : MonoBehaviour, ISysFontTexturable
 
       if (_shader == null)
       {
-        if( _texture.IsRGBA){
-          _shader = Shader.Find("SysFont/RGBA");
+        if(_texture.IsRGBA){
+          _shader = RGBAShader;
         }
         else{
-          _shader = Shader.Find("SysFont/Unlit Transparent");
+          _shader = NoRGBAShader;
         }
-        
       }
-
       if (_createdMaterial == null)
       {
         _createdMaterial = new Material(_shader);
       }
       _createdMaterial.hideFlags = HideFlags.HideInInspector | HideFlags.DontSave;
       _material = _createdMaterial;
+
       _renderer.sharedMaterial = _material;
     }
 
-    _material.color = _fontColor;
-    _lastFontColor = _fontColor;
+    if (!_texture.IsRGBA) {
+        _material.color = FontColor;
+        _lastFontColor = FontColor;
+    }
 
     if (_uv == null)
     {
@@ -435,10 +434,17 @@ public class SysFontText : MonoBehaviour, ISysFontTexturable
       _material.mainTexture = Texture;
     }
 
-    if ((_fontColor != _lastFontColor) && (_material != null))
-    {
-      _material.color = _fontColor;
-      _lastFontColor = _fontColor;
+    if (!_texture.IsRGBA && (FontColor != _lastFontColor) && (_material != null)) {
+      _material.color = FontColor;
+      _lastFontColor = FontColor;
+    }
+
+    if (_texture.IsRGBA && _shader != RGBAShader){
+      _shader = RGBAShader;
+      _material.shader = _shader;
+    } else if (!_texture.IsRGBA && _shader != NoRGBAShader) {
+      _shader = NoRGBAShader;
+      _material.shader = _shader;
     }
 
     if (_lastPivot != _pivot)
