@@ -304,7 +304,13 @@ public class SysFontText : MonoBehaviour, ISysFontTexturable
 
       if (_shader == null)
       {
-        _shader = Shader.Find("SysFont/Unlit Transparent");
+        if( _texture.IsRGBA){
+          _shader = Shader.Find("SysFont/RGBA");
+        }
+        else{
+          _shader = Shader.Find("SysFont/Unlit Transparent");
+        }
+        
       }
 
       if (_createdMaterial == null)
