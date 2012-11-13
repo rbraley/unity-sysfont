@@ -20,7 +20,6 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-
 using UnityEngine;
 
 [ExecuteInEditMode]
@@ -163,7 +162,7 @@ public class UISysFontLabel : UIWidget, ISysFontTexturable
     }
   }
 
-  public int WidthPixels 
+  public int WidthPixels
   {
     get
     {
@@ -171,7 +170,7 @@ public class UISysFontLabel : UIWidget, ISysFontTexturable
     }
   }
 
-  public int HeightPixels 
+  public int HeightPixels
   {
     get
     {
@@ -179,7 +178,7 @@ public class UISysFontLabel : UIWidget, ISysFontTexturable
     }
   }
 
-  public int TextWidthPixels 
+  public int TextWidthPixels
   {
     get
     {
@@ -187,7 +186,7 @@ public class UISysFontLabel : UIWidget, ISysFontTexturable
     }
   }
 
-  public int TextHeightPixels 
+  public int TextHeightPixels
   {
     get
     {
@@ -207,9 +206,74 @@ public class UISysFontLabel : UIWidget, ISysFontTexturable
   protected Material _createdMaterial = null;
   protected Vector3[] _vertices = null;
   protected Vector2 _uv;
+ 
+  #region UILabel-UIInput compatibility
+ 
+  [HideInInspector]
+  [SerializeField]
+  bool mPassword = false;
+  [HideInInspector]
+  [SerializeField]
+  bool mShowLastChar = false;
+ 
+  public bool supportEncoding
+  {
+    get
+    {
+      return false;  
+    }
+    set
+    {
+      // we can throw this away since we don't need to support inline color codes in text 
+    }
+  }
+ 
+ 
+  /// <summary>
+  /// Whether the last character of a password field will be shown
+  /// </summary>
+  public bool showLastPasswordChar
+  {
+    get
+    {
+      return mShowLastChar;
+    }
+    set
+    {
+      if (mShowLastChar != value)
+      {
+        mShowLastChar = value;
+        //hasChanged = true;
+      }
+    }
+  }
+ 
+ 
+  /// <summary>
+  /// Whether the label's contents should be hidden
+  /// </summary>
+  public bool password
+  {
+    get
+    {
+      return mPassword;
+    }
+    set
+    {
+      if (mPassword != value)
+      {
+        mPassword = value;
+        IsMultiLine = false;
+        //mMaxLineCount  = 1;
+        //hasChanged   = true;
+      }
+    }
+  }
+ 
+  #endregion
 
   #region UIWidget
-	public override bool keepMaterial
+  public override bool keepMaterial
   {
     get
     {
@@ -251,10 +315,10 @@ public class UISysFontLabel : UIWidget, ISysFontTexturable
     if (_vertices == null)
     {
       _vertices = new Vector3[4];
-      _vertices[0] = new Vector3(1f,  0f, 0f);
+      _vertices[0] = new Vector3(1f, 0f, 0f);
       _vertices[1] = new Vector3(1f, -1f, 0f);
       _vertices[2] = new Vector3(0f, -1f, 0f);
-      _vertices[3] = new Vector3(0f,  0f, 0f);
+      _vertices[3] = new Vector3(0f, 0f, 0f);
     }
 
     verts.Add(_vertices[0]);
@@ -308,6 +372,6 @@ public class UISysFontLabel : UIWidget, ISysFontTexturable
       _texture.Destroy();
       _texture = null;
     }
-	}
+  }
   #endregion
 }
